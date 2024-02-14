@@ -43,10 +43,10 @@ transition <- odin::odin({
   sg <- 13.25 # Effects of density-dependence on late instars (L) relative to early instars (E)
   
   ## S,E,I are arrays
-  lambda <- 10/10 # biting rate of mosquitoes per-cycle (source: TRANSFIL, 1 month of TRANSFIL has 10 cycles)
-  InfecMosq <- 0.37 # Vector competence, proportion of mosquitoes which pick up infection when biting an infective host (source: TRANSFIL)
+  lambda <- 10/10 # biting rate of mosquitoes per cycle (source: TRANSFIL, 1 month of TRANSFIL has 10 cycles)
+  InfecMosq <- 0.37 # Vector competence, the proportion of mosquitoes which pick up the infection when biting an infective host (source: TRANSFIL)
   epsilon <- 1/(14/3) # incubation rate of LF in mosquitoes (per-cycle)
-  InfHuman <- 0.01 # 0.01 is trial # Proportion of infected human in the population with detectable microfilariae
+  InfHuman <- 0.01 # 0.01 is trial # Proportion of infected humans in the population with detectable microfilariae
   
   # 2. INITIAL VALUES ############################################################
   initial(E) <- 115
@@ -77,7 +77,7 @@ transition <- odin::odin({
   
   deriv(E) <- if (temp_deriv_E > 0) temp_deriv_E else 0 # Checking of the result < 0, throw 0
   deriv(L) <- if (temp_deriv_L > 0) temp_deriv_L else 0 # Checking of the result < 0, throw 0
-  deriv(N) <- L*gL*(1-mu2)^3*.5 -N*(g1*exp((0)*3*g2)) # given mortality as age = 1(*3 for 1 cycle), assume g1*exp((0)*3*g2) = baseline mortality rate at day 0
+  deriv(N) <- L*gL*(1-mu2)*.5 -N*(g1*exp((0)*3*g2)) # given mortality as age = 1(*3 for 1 cycle), assume g1*exp((0)*3*g2) = baseline mortality rate at day 0
   
   # Insert deriv(N) as the first cycle of susceptible mosquitoes
   # Disease dynamics
