@@ -153,15 +153,15 @@ for (i in seq_along(InfHuman_values)) {
 
 # dataframe storage
 Output_InfHuman <- data.frame(
-  # timesteps = rep(timesteps, length(InfHuman_values)), # timesteps not required because it give repetitions in each column
-  InfHuman_values = rep(InfHuman_values, each = length(timesteps)),
-  S_v_loop = rep(S_v_loop, each = length(timesteps)),
-  E_v_loop = rep(E_v_loop, each = length(timesteps)),
-  I_v_loop = rep(I_v_loop, each = length(timesteps)),
+  # timesteps not required because it gives repetitions in each column
+  InfHuman_values = InfHuman_values,
+  S_v_loop = S_v_loop,
+  E_v_loop = E_v_loop,
+  I_v_loop = I_v_loop,
   
   # Additional coz' I'm curious about the result
-  V_loop = rep(V_loop, each = length(timesteps)),
-  Prev_loop = rep(Prev_loop, each = length(timesteps)) # Iv/V OR proportion of all infective mosquitoes
+  V_loop = V_loop,
+  Prev_loop = Prev_loop # Iv/V OR proportion of all infective mosquitoes
 )
 
 # Output_InfHuman
