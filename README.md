@@ -1,1 +1,2 @@
 This is a mosquito dynamics model for lymphatic filariasis. The population dynamics adapted from White, et al. (2011) and the disease dynamics adapted from the Ross-MacDonald Susceptible-Exposed-Infected (S-E-I) model.
+This branch is constructed to isolate and identify the effect of various prevalence in human population (ranging from 0 to 1) to the proportion of infective (Iv/total parous female) and positive ((Ev+Iv)/total parous female) mosquitoes.
