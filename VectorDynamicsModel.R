@@ -102,7 +102,8 @@ transition <- odin::odin({
   output(I_v_tot) <- I_v_tot
   output(V_tot) <- V_tot
   
-  output(prev) <- I_v_tot / V_tot
+  output(prev) <- I_v_tot/V_tot
+  output(pos) <- (E_v_tot+I_v_tot)/V_tot
   
   config(base) <- "transition"
 })
@@ -120,7 +121,7 @@ tail(y[,"prev"],1)
 
 # Trial2 Various cycle_width AND InfHuman values: ##############################
 cycle_width_values <- seq(3, 30, by = 3)
-InfHuman_values <- seq(0, 1, by = 0.001)  # Specify the range of InfHuman values
+InfHuman_values <- c(seq(0, 0.02, by = 0.001), seq(0.02, 1, by = 0.01))  # Separate InfHuman into 2 prevalence ranges; below WHO threshold and above
 
 # Vector dimension storage
 S_v_loop <- numeric(length(InfHuman_values))
@@ -130,6 +131,7 @@ I_v_loop <- numeric(length(InfHuman_values))
 # Additional coz' I'm curious about the result
 V_loop <- numeric(length(InfHuman_values))
 Prev_loop <- numeric(length(InfHuman_values)) # Iv/V OR proportion of all infective mosquitoes
+Pos_loop <- numeric(length(InfHuman_values)) # (Ev+Iv)/V OR proportion of all positive mosquitoes
 
 # Trial loop function
 for (i in seq_along(InfHuman_values)) {
@@ -146,8 +148,8 @@ for (i in seq_along(InfHuman_values)) {
   
   V_loop[i] <- tail(y[,"V_tot"], 1) # total parous mosquitoes, given InfHuman
   
-  
   Prev_loop[i] <- tail(y[,"prev"], 1) # Infective only
+  Pos_loop[i] <- tail(y[,"pos"], 1) # All positives
 }
 
 
@@ -161,14 +163,29 @@ Output_InfHuman <- data.frame(
   
   # Additional coz' I'm curious about the result
   V_loop = V_loop,
-  Prev_loop = Prev_loop # Iv/V OR proportion of all infective mosquitoes
+  Prev_loop = Prev_loop, # Iv/V OR proportion of all infective mosquitoes
+  Pos_loop = Pos_loop # All positives
 )
 
 # Output_InfHuman
 
 write.csv(Output_InfHuman, file = "Output_InfHuman.csv", row.names = FALSE)
 
+par(mfrow=c(1,2))
+# plot for InfHuman below WHO threshold
 plot(Output_InfHuman$InfHuman_values, Output_InfHuman$Prev_loop,
      xlab = "Prevalence of LF in human population (with microfilaremia)",
      ylab = "Prevalence of infective mosquitoes",
-     xlim = c(0,1), ylim = c(0,.3), type = "l")
+     main = "Below WHO proposed thresholds (1% or 2%)",
+     xlim = c(0,.2), ylim = c(0,.05), type = "l", col = "red")
+line(Output_InfHuman$InfHuman_values, Output_InfHuman$Pos_loop, col = "blue")
+
+# plot for InfHuman above WHO threshold
+plot(Output_InfHuman$InfHuman_values, Output_InfHuman$Prev_loop,
+     xlab = "Prevalence of LF in human population (with microfilaremia)",
+     ylab = "Prevalence of infective mosquitoes",
+     main = "Above WHO proposed thresholds",
+     xlim = c(0,1), ylim = c(0,.2), type = "l", col = "red")
+line(Output_InfHuman$InfHuman_values, Output_InfHuman$Pos_loop, col = "blue")
+
+par(mfrow=c(1,1))
