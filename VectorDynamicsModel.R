@@ -4,18 +4,9 @@ if (!require(odin, quietly=T)){
 }
 
 transition <- odin::odin({
-  N_cycle <- 10
+  N_cycle <- length(cycle_width)
   # Nulliparous means day 0, mosquitoes emerged from aquatic stages
-  cycle_width[1] <- 3 * 1 # First gonotrophic cycle, 3 days
-  cycle_width[2] <- 3 * 2 # Second gonotrophic cycle, 6 days
-  cycle_width[3] <- 3 * 3
-  cycle_width[4] <- 3 * 4
-  cycle_width[5] <- 3 * 5
-  cycle_width[6] <- 3 * 6
-  cycle_width[7] <- 3 * 7
-  cycle_width[8] <- 3 * 8
-  cycle_width[9] <- 3 * 9
-  cycle_width[10] <- 3 * 10
+  cycle_width[] <- user() # First gonotrophic cycle, 3 days
   
   cycle_rate[1:(N_cycle - 1)] <- 1 / cycle_width[i]
   cycle_rate[N_cycle] <- 0
@@ -64,7 +55,7 @@ transition <- odin::odin({
   dim(E_v) <- N_cycle
   dim(I_v) <- N_cycle
   dim(den) <- N_cycle
-  dim(cycle_width) <- N_cycle
+  dim(cycle_width) <- user()
   dim(cycle_rate) <- N_cycle
   
   # Define mortality rates in 1 cycle (3 days)
@@ -109,6 +100,10 @@ transition <- odin::odin({
   config(base) <- "transition"
 })
 
-mod <- transition()  ## user defined values in function in order.
+cycle_width_values <- seq(3, 30, by = 3)
+
+pars <- list(cycle_width = cycle_width_values)
+
+mod <- transition$new(user = pars) # changing the cycle by user loops instead of define the cycle_width one-by-one
 timesteps <- seq(0, 2000, by=1)   # time.
 y <- mod$run(timesteps)
