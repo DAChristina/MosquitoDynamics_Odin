@@ -18,8 +18,8 @@ transition <- odin::odin({
   
   # 1. PARAMETERS ################################################################
   # Gompertz mortality rate have already in cycle (Clements & Paterson, 1981)
-  g1 <- 0.356
-  g2 <- 0.097
+  g1 <- user()
+  g2 <- user()
   # With Survival(i) = (exp(-g1/g2*(exp(i*g2)-1))
   
   # Population Dynamics, Eggs -> Larvae -> Mature (White et al., 2011)
@@ -101,8 +101,12 @@ transition <- odin::odin({
 })
 
 cycle_width_values <- seq(3, 30, by = 3)
+Gompz_pars1 <- c(.356, .339) # 1 = An. gambiae, 2 = An. arabiensis
+Gompz_pars2 <- c(.097, .225) # 1 = An. gambiae, 2 = An. arabiensis
 
-pars <- list(cycle_width = cycle_width_values)
+pars <- list(cycle_width = cycle_width_values,
+             g1 = Gompz_pars1[1], # choose[1] for An. gambiae, [2] for An. arabiensis
+             g2 = Gompz_pars2[1]) # choose[1] for An. gambiae, [2] for An. arabiensis)
 
 mod <- transition$new(user = pars) # changing the cycle by user loops instead of define the cycle_width one-by-one
 timesteps <- seq(0, 2000, by=1)   # time.
