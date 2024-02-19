@@ -18,8 +18,8 @@ transition <- odin::odin({
   
   # 1. PARAMETERS ##############################################################
   # Gompertz mortality rate have already in cycle (Clements & Paterson, 1981)
-  g1 <- 0.356
-  g2 <- 0.097
+  g1 <- user()
+  g2 <- user()
   # With Survival(i) = (exp(-g1/g2*(exp(i*g2)-1))
   
   # Population Dynamics, Eggs -> Larvae -> Mature (White et al., 2011)
@@ -37,14 +37,7 @@ transition <- odin::odin({
   lambda <- 10/10 # biting rate of mosquitoes per cycle (source: TRANSFIL, 1 month of TRANSFIL has 10 cycles)
   InfecMosq <- 0.37 # Vector competence, the proportion of mosquitoes which pick up the infection when biting an infective host (source: TRANSFIL)
   epsilon <- 1/(14/3) # incubation rate of LF in mosquitoes (per-cycle)
-  # InfHuman <- 0.01 # 0.01 is trial # Proportion of infected humans in the population with detectable microfilariae
-  
-  # Change InfHuman into various numbers:
-  # N_InfHuman <- length(InfHuman)
-  InfHuman <- user() # Also, change the dimension matrix
-  
-  # Dimension matrix be like:
-  # sum_dim <- N_InfHuman+N_cycle
+  InfHuman <- user() # Proportion of infected humans in the population with detectable microfilariae
   
   # 2. INITIAL VALUES ##########################################################
   initial(E) <- 115
@@ -122,6 +115,8 @@ tail(y[,"prev"],1)
 # Trial2 Various cycle_width AND InfHuman values: ##############################
 cycle_width_values <- seq(3, 30, by = 3)
 InfHuman_values <- c(seq(0, 0.02, by = 0.001), seq(0.02, 1, by = 0.01))  # Separate InfHuman into 2 prevalence ranges; below WHO threshold and above
+Gompz_pars1 <- c(.356, .339) # 1 = An. gambiae, 2 = An. arabiensis
+Gompz_pars2 <- c(.097, .225) # 1 = An. gambiae, 2 = An. arabiensis
 
 # Vector dimension storage
 S_v_loop <- numeric(length(InfHuman_values))
@@ -136,7 +131,9 @@ Pos_loop <- numeric(length(InfHuman_values)) # (Ev+Iv)/V OR proportion of all po
 # Trial loop function
 for (i in seq_along(InfHuman_values)) {
   pars <- list(cycle_width = cycle_width_values,
-               InfHuman = InfHuman_values[i])
+               InfHuman = InfHuman_values[i],
+               g1 = Gompz_pars1[1], # choose[1] for An. gambiae, [2] for An. arabiensis
+               g2 = Gompz_pars2[1]) # choose[1] for An. gambiae, [2] for An. arabiensis)
   
   mod <- transition$new(user = pars)
   timesteps <- seq(0, 2000, by = 1)
@@ -154,7 +151,7 @@ for (i in seq_along(InfHuman_values)) {
 
 
 # dataframe storage
-Output_InfHuman <- data.frame(
+Output_InfHuman_Angambiae <- data.frame(
   # timesteps not required because it gives repetitions in each column
   InfHuman_values = InfHuman_values,
   S_v_loop = S_v_loop,
@@ -167,15 +164,15 @@ Output_InfHuman <- data.frame(
   Pos_loop = Pos_loop # All positives
 )
 
-# Output_InfHuman
+# Output_InfHuman_Angambiae
 
-write.csv(Output_InfHuman, file = "Output_InfHuman.csv", row.names = FALSE)
+write.csv(Output_InfHuman_Angambiae, file = "Output_InfHuman_Angambiae.csv", row.names = FALSE)
 
 par(mfrow=c(1,2))
 # plot for InfHuman below WHO threshold
 plot(Output_InfHuman$InfHuman_values, Output_InfHuman$Prev_loop,
      xlab = "Prevalence of LF in human population (with microfilaremia)",
-     ylab = "Prevalence of infective mosquitoes",
+     ylab = "Prevalence of infective An. gambiae",
      main = "Below WHO proposed thresholds (1% or 2%)",
      xlim = c(0,.2), ylim = c(0,.15), type = "l", col = "red")
 lines(Output_InfHuman$InfHuman_values, Output_InfHuman$Pos_loop, col = "blue")
@@ -183,8 +180,8 @@ lines(Output_InfHuman$InfHuman_values, Output_InfHuman$Pos_loop, col = "blue")
 # plot for InfHuman above WHO threshold
 plot(Output_InfHuman$InfHuman_values, Output_InfHuman$Prev_loop,
      xlab = "Prevalence of LF in human population (with microfilaremia)",
-     ylab = "Prevalence of infective mosquitoes",
-     main = "Above WHO proposed thresholds",
+     ylab = "Prevalence of infective An. gambiae",
+     main = "All prevalence in human population",
      xlim = c(0,1), ylim = c(0,.5), type = "l", col = "red")
 lines(Output_InfHuman$InfHuman_values, Output_InfHuman$Pos_loop, col = "blue")
 
