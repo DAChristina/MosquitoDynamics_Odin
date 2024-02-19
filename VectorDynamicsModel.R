@@ -16,7 +16,7 @@ transition <- odin::odin({
   ## to work out the % of the population in each cycle group
   den[2:N_cycle] <- cycle_rate[i - 1] * den[i - 1] / (cycle_rate[i] + (1/beta))
   
-  # 1. PARAMETERS ################################################################
+  # 1. PARAMETERS ##############################################################
   # Gompertz mortality rate have already in cycle (Clements & Paterson, 1981)
   g1 <- 0.356
   g2 <- 0.097
@@ -37,9 +37,16 @@ transition <- odin::odin({
   lambda <- 10/10 # biting rate of mosquitoes per cycle (source: TRANSFIL, 1 month of TRANSFIL has 10 cycles)
   InfecMosq <- 0.37 # Vector competence, the proportion of mosquitoes which pick up the infection when biting an infective host (source: TRANSFIL)
   epsilon <- 1/(14/3) # incubation rate of LF in mosquitoes (per-cycle)
-  InfHuman <- 0.01 # 0.01 is trial # Proportion of infected humans in the population with detectable microfilariae
+  # InfHuman <- 0.01 # 0.01 is trial # Proportion of infected humans in the population with detectable microfilariae
   
-  # 2. INITIAL VALUES ############################################################
+  # Change InfHuman into various numbers:
+  # N_InfHuman <- length(InfHuman)
+  InfHuman <- user() # Also, change the dimension matrix
+  
+  # Dimension matrix be like:
+  # sum_dim <- N_InfHuman+N_cycle
+  
+  # 2. INITIAL VALUES ##########################################################
   initial(E) <- 115
   initial(L) <- 60
   initial(N) <- 52
@@ -95,15 +102,90 @@ transition <- odin::odin({
   output(I_v_tot) <- I_v_tot
   output(V_tot) <- V_tot
   
-  output(prev) <- I_v_tot / V_tot
+  output(prev) <- I_v_tot/V_tot
+  output(pos) <- (E_v_tot+I_v_tot)/V_tot
   
   config(base) <- "transition"
 })
 
+# Trial1 Various cycle_width values: ###########################################
 cycle_width_values <- seq(3, 30, by = 3)
-
-pars <- list(cycle_width = cycle_width_values)
+pars <- list(cycle_width = cycle_width_values,
+             InfHuman = .01)
 
 mod <- transition$new(user = pars) # changing the cycle by user loops instead of define the cycle_width one-by-one
 timesteps <- seq(0, 2000, by=1)   # time.
 y <- mod$run(timesteps)
+
+tail(y[,"prev"],1)
+
+# Trial2 Various cycle_width AND InfHuman values: ##############################
+cycle_width_values <- seq(3, 30, by = 3)
+InfHuman_values <- c(seq(0, 0.02, by = 0.001), seq(0.02, 1, by = 0.01))  # Separate InfHuman into 2 prevalence ranges; below WHO threshold and above
+
+# Vector dimension storage
+S_v_loop <- numeric(length(InfHuman_values))
+E_v_loop <- numeric(length(InfHuman_values))
+I_v_loop <- numeric(length(InfHuman_values))
+
+# Additional coz' I'm curious about the result
+V_loop <- numeric(length(InfHuman_values))
+Prev_loop <- numeric(length(InfHuman_values)) # Iv/V OR proportion of all infective mosquitoes
+Pos_loop <- numeric(length(InfHuman_values)) # (Ev+Iv)/V OR proportion of all positive mosquitoes
+
+# Trial loop function
+for (i in seq_along(InfHuman_values)) {
+  pars <- list(cycle_width = cycle_width_values,
+               InfHuman = InfHuman_values[i])
+  
+  mod <- transition$new(user = pars)
+  timesteps <- seq(0, 2000, by = 1)
+  y <- mod$run(timesteps)
+  
+  S_v_loop[i] <- tail(y[,"S_v_tot"], 1) # All susceptibles from 10 gonotrophic cycle, given InfHuman
+  E_v_loop[i] <- tail(y[,"E_v_tot"], 1) # All exposed from 10 gonotrophic cycle, given InfHuman
+  I_v_loop[i] <- tail(y[,"I_v_tot"], 1) # All infectives from 10 gonotrophic cycle, given InfHuman
+  
+  V_loop[i] <- tail(y[,"V_tot"], 1) # total parous mosquitoes, given InfHuman
+  
+  Prev_loop[i] <- tail(y[,"prev"], 1) # Infective only
+  Pos_loop[i] <- tail(y[,"pos"], 1) # All positives
+}
+
+
+# dataframe storage
+Output_InfHuman <- data.frame(
+  # timesteps not required because it gives repetitions in each column
+  InfHuman_values = InfHuman_values,
+  S_v_loop = S_v_loop,
+  E_v_loop = E_v_loop,
+  I_v_loop = I_v_loop,
+  
+  # Additional coz' I'm curious about the result
+  V_loop = V_loop,
+  Prev_loop = Prev_loop, # Iv/V OR proportion of all infective mosquitoes
+  Pos_loop = Pos_loop # All positives
+)
+
+# Output_InfHuman
+
+write.csv(Output_InfHuman, file = "Output_InfHuman.csv", row.names = FALSE)
+
+par(mfrow=c(1,2))
+# plot for InfHuman below WHO threshold
+plot(Output_InfHuman$InfHuman_values, Output_InfHuman$Prev_loop,
+     xlab = "Prevalence of LF in human population (with microfilaremia)",
+     ylab = "Prevalence of infective mosquitoes",
+     main = "Below WHO proposed thresholds (1% or 2%)",
+     xlim = c(0,.2), ylim = c(0,.15), type = "l", col = "red")
+lines(Output_InfHuman$InfHuman_values, Output_InfHuman$Pos_loop, col = "blue")
+
+# plot for InfHuman above WHO threshold
+plot(Output_InfHuman$InfHuman_values, Output_InfHuman$Prev_loop,
+     xlab = "Prevalence of LF in human population (with microfilaremia)",
+     ylab = "Prevalence of infective mosquitoes",
+     main = "Above WHO proposed thresholds",
+     xlim = c(0,1), ylim = c(0,.5), type = "l", col = "red")
+lines(Output_InfHuman$InfHuman_values, Output_InfHuman$Pos_loop, col = "blue")
+
+par(mfrow=c(1,1))
