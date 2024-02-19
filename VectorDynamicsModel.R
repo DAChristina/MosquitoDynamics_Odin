@@ -38,10 +38,14 @@ transition <- odin::odin({
   InfecMosq <- 0.37 # Vector competence, the proportion of mosquitoes which pick up the infection when biting an infective host (source: TRANSFIL)
   epsilon <- 1/(14/3) # incubation rate of LF in mosquitoes (per-cycle)
   # InfHuman <- 0.01 # 0.01 is trial # Proportion of infected humans in the population with detectable microfilariae
-
-  # Given various InfHuman values:
-  InfHuman <- user()
-
+  
+  # Change InfHuman into various numbers:
+  # N_InfHuman <- length(InfHuman)
+  InfHuman <- user() # Also, change the dimension matrix
+  
+  # Dimension matrix be like:
+  # sum_dim <- N_InfHuman+N_cycle
+  
   # 2. INITIAL VALUES ##########################################################
   initial(E) <- 115
   initial(L) <- 60
@@ -116,10 +120,16 @@ tail(y[,"prev"],1)
 
 # Trial2 Various cycle_width AND InfHuman values: ##############################
 cycle_width_values <- seq(3, 30, by = 3)
-InfHuman_values <- seq(0.01, 1, by = 0.01)  # Specify the range of InfHuman values
+InfHuman_values <- seq(0, 1, by = 0.001)  # Specify the range of InfHuman values
 
-# Vector dimension store
-tail_prev <- numeric(length(InfHuman_values))  
+# Vector dimension storage
+S_v_loop <- numeric(length(InfHuman_values))
+E_v_loop <- numeric(length(InfHuman_values))
+I_v_loop <- numeric(length(InfHuman_values))
+
+# Additional coz' I'm curious about the result
+V_loop <- numeric(length(InfHuman_values))
+Prev_loop <- numeric(length(InfHuman_values)) # Iv/V OR proportion of all infective mosquitoes
 
 # Trial loop function
 for (i in seq_along(InfHuman_values)) {
@@ -129,12 +139,36 @@ for (i in seq_along(InfHuman_values)) {
   mod <- transition$new(user = pars)
   timesteps <- seq(0, 2000, by = 1)
   y <- mod$run(timesteps)
-  tail_prev[i] <- tail(y[,"prev"], 1) # Focused on tail(y[,"prev"],1) result
+  
+  S_v_loop[i] <- tail(y[,"S_v_tot"], 1) # All susceptibles from 10 gonotrophic cycle, given InfHuman
+  E_v_loop[i] <- tail(y[,"E_v_tot"], 1) # All exposed from 10 gonotrophic cycle, given InfHuman
+  I_v_loop[i] <- tail(y[,"I_v_tot"], 1) # All infectives from 10 gonotrophic cycle, given InfHuman
+  
+  V_loop[i] <- tail(y[,"V_tot"], 1) # total parous mosquitoes, given InfHuman
+  
+  
+  Prev_loop[i] <- tail(y[,"prev"], 1) # Infective only
 }
 
-# tail_prev
 
-plot(InfHuman_values, tail_prev,
-     xlab = "Prevalence of human with microfilaremia within the population",
+# dataframe storage
+Output_InfHuman <- data.frame(
+  # timesteps = rep(timesteps, length(InfHuman_values)), # timesteps not required because it give repetitions in each column
+  InfHuman_values = rep(InfHuman_values, each = length(timesteps)),
+  S_v_loop = rep(S_v_loop, each = length(timesteps)),
+  E_v_loop = rep(E_v_loop, each = length(timesteps)),
+  I_v_loop = rep(I_v_loop, each = length(timesteps)),
+  
+  # Additional coz' I'm curious about the result
+  V_loop = rep(V_loop, each = length(timesteps)),
+  Prev_loop = rep(Prev_loop, each = length(timesteps)) # Iv/V OR proportion of all infective mosquitoes
+)
+
+# Output_InfHuman
+
+write.csv(Output_InfHuman, file = "Output_InfHuman.csv", row.names = FALSE)
+
+plot(Output_InfHuman$InfHuman_values, Output_InfHuman$Prev_loop,
+     xlab = "Prevalence of LF in human population (with microfilaremia)",
      ylab = "Prevalence of infective mosquitoes",
      xlim = c(0,1), ylim = c(0,.3), type = "l")
