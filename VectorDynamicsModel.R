@@ -177,7 +177,7 @@ plot(Output_InfHuman$InfHuman_values, Output_InfHuman$Prev_loop,
      xlab = "Prevalence of LF in human population (with microfilaremia)",
      ylab = "Prevalence of infective mosquitoes",
      main = "Below WHO proposed thresholds (1% or 2%)",
-     xlim = c(0,.2), ylim = c(0,.05), type = "l", col = "red")
+     xlim = c(0,.2), ylim = c(0,.15), type = "l", col = "red")
 lines(Output_InfHuman$InfHuman_values, Output_InfHuman$Pos_loop, col = "blue")
 
 # plot for InfHuman above WHO threshold
@@ -185,7 +185,7 @@ plot(Output_InfHuman$InfHuman_values, Output_InfHuman$Prev_loop,
      xlab = "Prevalence of LF in human population (with microfilaremia)",
      ylab = "Prevalence of infective mosquitoes",
      main = "Above WHO proposed thresholds",
-     xlim = c(0,1), ylim = c(0,.2), type = "l", col = "red")
+     xlim = c(0,1), ylim = c(0,.5), type = "l", col = "red")
 lines(Output_InfHuman$InfHuman_values, Output_InfHuman$Pos_loop, col = "blue")
 
 par(mfrow=c(1,1))
