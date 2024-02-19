@@ -16,7 +16,7 @@ transition <- odin::odin({
   ## to work out the % of the population in each cycle group
   den[2:N_cycle] <- cycle_rate[i - 1] * den[i - 1] / (cycle_rate[i] + (1/beta))
   
-  # 1. PARAMETERS ################################################################
+  # 1. PARAMETERS ##############################################################
   # Gompertz mortality rate have already in cycle (Clements & Paterson, 1981)
   g1 <- 0.356
   g2 <- 0.097
@@ -37,9 +37,12 @@ transition <- odin::odin({
   lambda <- 10/10 # biting rate of mosquitoes per cycle (source: TRANSFIL, 1 month of TRANSFIL has 10 cycles)
   InfecMosq <- 0.37 # Vector competence, the proportion of mosquitoes which pick up the infection when biting an infective host (source: TRANSFIL)
   epsilon <- 1/(14/3) # incubation rate of LF in mosquitoes (per-cycle)
-  InfHuman <- 0.01 # 0.01 is trial # Proportion of infected humans in the population with detectable microfilariae
-  
-  # 2. INITIAL VALUES ############################################################
+  # InfHuman <- 0.01 # 0.01 is trial # Proportion of infected humans in the population with detectable microfilariae
+
+  # Given various InfHuman values:
+  InfHuman <- user()
+
+  # 2. INITIAL VALUES ##########################################################
   initial(E) <- 115
   initial(L) <- 60
   initial(N) <- 52
@@ -100,10 +103,38 @@ transition <- odin::odin({
   config(base) <- "transition"
 })
 
+# Trial1 Various cycle_width values: ###########################################
 cycle_width_values <- seq(3, 30, by = 3)
-
-pars <- list(cycle_width = cycle_width_values)
+pars <- list(cycle_width = cycle_width_values,
+             InfHuman = .01)
 
 mod <- transition$new(user = pars) # changing the cycle by user loops instead of define the cycle_width one-by-one
 timesteps <- seq(0, 2000, by=1)   # time.
 y <- mod$run(timesteps)
+
+tail(y[,"prev"],1)
+
+# Trial2 Various cycle_width AND InfHuman values: ##############################
+cycle_width_values <- seq(3, 30, by = 3)
+InfHuman_values <- seq(0.01, 1, by = 0.01)  # Specify the range of InfHuman values
+
+# Vector dimension store
+tail_prev <- numeric(length(InfHuman_values))  
+
+# Trial loop function
+for (i in seq_along(InfHuman_values)) {
+  pars <- list(cycle_width = cycle_width_values,
+               InfHuman = InfHuman_values[i])
+  
+  mod <- transition$new(user = pars)
+  timesteps <- seq(0, 2000, by = 1)
+  y <- mod$run(timesteps)
+  tail_prev[i] <- tail(y[,"prev"], 1) # Focused on tail(y[,"prev"],1) result
+}
+
+# tail_prev
+
+plot(InfHuman_values, tail_prev,
+     xlab = "Prevalence of human with microfilaremia within the population",
+     ylab = "Prevalence of infective mosquitoes",
+     xlim = c(0,1), ylim = c(0,.3), type = "l")
