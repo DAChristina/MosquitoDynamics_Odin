@@ -96,6 +96,7 @@ transition <- odin::odin({
   output(V_tot) <- V_tot
   
   output(prev) <- I_v_tot / V_tot
+  output(pos) <- (E_v_tot+I_v_tot) / V_tot
   
   config(base) <- "transition"
 })
