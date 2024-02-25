@@ -45,5 +45,13 @@ plot(dat$InfHuman_values, dat$Pos_loop.x, # An. gambiae
      ylab = "Proportion of positive mosquitoes",
      main = "Proportion of positive mosquitoes",
      xlim = c(0,.021), ylim = c(0,.014), type = "l", col = "red")
+
+# Burkina Faso data points:
+points(0.00471, 0.033898) # (Human data = Dano (Nablegane 2016 TAS1), Mosquito data = Ouessa)
+text(0.00471, 0.033898, "(Dano, Ouessa)", adj = c(-0.1, -0.5), col = "black")
+
+points(0.061, 0.003367) # (Human data = Diebougou (Danko-Tanzou 2017 spot-check FTS 19/316 participants), Mosquito data = Bapla)
+text(0.061, 0.003367, "(Diebougou, Bapla)", adj = c(-0.1, -0.5), col = "black")
+
 lines(dat$InfHuman_values, dat$Pos_loop.y, col = "blue") # An. arabiensis
 par(mfrow = c(1,1))
