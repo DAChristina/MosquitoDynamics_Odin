@@ -101,17 +101,6 @@ transition <- odin::odin({
   config(base) <- "transition"
 })
 
-# Trial1 Various cycle_width values: ###########################################
-cycle_width_values <- seq(3, 30, by = 3)
-pars <- list(cycle_width = cycle_width_values,
-             InfHuman = .01)
-
-mod <- transition$new(user = pars) # changing the cycle by user loops instead of define the cycle_width one-by-one
-timesteps <- seq(0, 2000, by=1)   # time.
-y <- mod$run(timesteps)
-
-tail(y[,"prev"],1)
-
 # Trial2 Various cycle_width AND InfHuman values: ##############################
 cycle_width_values <- seq(3, 30, by = 3)
 InfHuman_values <- c(seq(0, 0.02, by = 0.001), seq(0.02, 1, by = 0.01))  # Separate InfHuman into 2 prevalence ranges; below WHO threshold and above
