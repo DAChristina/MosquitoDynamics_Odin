@@ -24,8 +24,8 @@ transition <- odin::odin({
   
   # Population Dynamics, Eggs -> Larvae -> Mature (White et al., 2011)
   beta <- 21.19*3 # Egg deposition per-capita, per-day * 3 days for 1 gonotrophic cycles
-  mu0 <- .034 # Per-capita daily mortality rate of Eggs & early instar larvae ^3 days for 1 gonotrophic cycles
-  mu1 <- .035 # Per-capita daily mortality rate of Late instar larvae ^3 days for 1 gonotrophic cycles
+  mu0 <- .034 # Per-capita daily mortality rate of Eggs & early instar larvae *3 days for 1 gonotrophic cycles
+  mu1 <- .035 # Per-capita daily mortality rate of Late instar larvae *3 days for 1 gonotrophic cycles
   mu2 <- .25 # Per-capita daily mortality rate of pupae
   gE <- 1/(6.64/3) # Time required for growth of Eggs to early instar larvae (in 1 cycle)
   gL <- 1/((3.72+0.64)/3)  # Time required for growth of early instar larvae to adult mosquitoes (in 1 cycle)
@@ -59,8 +59,8 @@ transition <- odin::odin({
   dim(cycle_rate) <- N_cycle
   
   # Define mortality rates in 1 cycle (3 days)
-  muE <- mu0^3*(1+(E+L)/K)
-  muL <- mu1^3*(1+sg*(E+L)/K)
+  muE <- mu0*3*(1+(E+L)/K)
+  muL <- mu1*3*(1+sg*(E+L)/K)
   
   # 3. DERIVATIVES #############################################################
   temp_deriv_E <- beta*V_tot -E*(gE+muE)
