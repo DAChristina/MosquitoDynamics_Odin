@@ -30,7 +30,7 @@ transition <- odin::odin({
   gE <- 1/(6.64/3) # Time required for growth of Eggs to early instar larvae (in 1 cycle)
   gL <- 1/((3.72+0.64)/3)  # Time required for growth of early instar larvae to adult mosquitoes (in 1 cycle)
   
-  K <- 200 # Carrying capacity
+  K <- 200 # Saturation coefficient
   sg <- 13.25 # Effects of density-dependence on late instars (L) relative to early instars (E)
   
   ## S,E,I are arrays
@@ -59,8 +59,8 @@ transition <- odin::odin({
   dim(cycle_rate) <- N_cycle
   
   # Define mortality rates in 1 cycle (3 days)
-  muE <- mu0^3*(1+(E+L)/K)
-  muL <- mu1^3*(1+sg*(E+L)/K)
+  muE <- mu0*3*(1+(E+L)/K)
+  muL <- mu1*3*(1+sg*(E+L)/K)
   
   # 3. DERIVATIVES #############################################################
   temp_deriv_E <- beta*V_tot -E*(gE+muE)
