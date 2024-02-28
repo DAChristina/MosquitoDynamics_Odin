@@ -106,8 +106,8 @@ cycle_width_values <- seq(3, 30, by = 3)
 Gompz_pars1 <- c(.356, .339) # 1 = An. gambiae, 2 = An. arabiensis
 Gompz_pars2 <- c(.097, .225) # 1 = An. gambiae, 2 = An. arabiensis
 
-K_values <- seq(0, 110, by = 1) # Assume V/H = 0.01 to 100,000 (given human pop H = 1,000 in TRANSFIL)
-timesteps <- seq(0, 2000, by = 1)
+K_values <- seq(0, 268000, by = 100)
+timesteps <- seq(0, 1000, by = 1)
 
 # MATRIX dimension storage (tried as hard as I can to avoid matrix but failed)
 E_mtx <- matrix(NA, nrow=length(timesteps), ncol=length(K_values))
