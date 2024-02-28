@@ -163,12 +163,12 @@ for (i in seq_along(sg)) {
 
 # How to access the result?
 # How about save it to *csvs???
-write.csv(E_mtx, file="Output_E_mu0_Angambiae.csv", row.names =F)
-write.csv(L_mtx, file="Output_L_mu0_Angambiae.csv", row.names =F)
-write.csv(N_mtx, file="Output_N_mu0_Angambiae.csv", row.names =F)
-write.csv(S_v_mtx, file="Output_S_v_mu0_Angambiae.csv", row.names =F)
-write.csv(E_v_mtx, file="Output_E_v_mu0_Angambiae.csv", row.names =F)
-write.csv(I_v_mtx, file="Output_I_v_mu0_Angambiae.csv", row.names =F)
-write.csv(V_mtx, file="Output_V_mu0_Angambiae.csv", row.names =F)
-write.csv(Prev_mtx, file="Output_Prev_mu0_Angambiae.csv", row.names =F)
-write.csv(Pos_mtx, file="Output_Pos_mu0_Angambiae.csv", row.names =F)
+write.csv(E_mtx, file="Output_E_gamma_Angambiae.csv", row.names =F)
+write.csv(L_mtx, file="Output_L_gamma_Angambiae.csv", row.names =F)
+write.csv(N_mtx, file="Output_N_gamma_Angambiae.csv", row.names =F)
+write.csv(S_v_mtx, file="Output_S_v_gamma_Angambiae.csv", row.names =F)
+write.csv(E_v_mtx, file="Output_E_v_gamma_Angambiae.csv", row.names =F)
+write.csv(I_v_mtx, file="Output_I_v_gamma_Angambiae.csv", row.names =F)
+write.csv(V_mtx, file="Output_V_gamma_Angambiae.csv", row.names =F)
+write.csv(Prev_mtx, file="Output_Prev_gamma_Angambiae.csv", row.names =F)
+write.csv(Pos_mtx, file="Output_Pos_gamma_Angambiae.csv", row.names =F)
