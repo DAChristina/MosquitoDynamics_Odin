@@ -24,20 +24,20 @@ transition <- odin::odin({
   
   # Population Dynamics, Eggs -> Larvae -> Mature (White et al., 2011)
   beta <- 21.19*3 # Egg deposition per-capita, per-day * 3 days for 1 gonotrophic cycles
-  mu0 <- .034 # Per-capita daily mortality rate of Eggs & early instar larvae *3 days for 1 gonotrophic cycles
-  mu1 <- .035 # Per-capita daily mortality rate of Late instar larvae *3 days for 1 gonotrophic cycles
+  mu0 <- user() # Per-capita daily mortality rate of Eggs & early instar larvae ^3 days for 1 gonotrophic cycles
+  mu1 <- .035 # Per-capita daily mortality rate of Late instar larvae ^3 days for 1 gonotrophic cycles
   mu2 <- .25 # Per-capita daily mortality rate of pupae
   gE <- 1/(6.64/3) # Time required for growth of Eggs to early instar larvae (in 1 cycle)
   gL <- 1/((3.72+0.64)/3)  # Time required for growth of early instar larvae to adult mosquitoes (in 1 cycle)
   
-  K <- 267800 # Saturation coefficient
-  sg <- 13.25 # Effects of density-dependence on late instars (L) relative to early instars (E)
+  K <- user() # Saturation coefficient
+  sg <- user() # Effects of density-dependence on late instars (L) relative to early instars (E)
   
   ## S,E,I are arrays
-  lambda <- 10/10 # biting rate of mosquitoes per cycle (source: TRANSFIL, 1 month of TRANSFIL has 10 cycles)
+  lambda <- user() # biting rate of mosquitoes per cycle (source: TRANSFIL, 1 month of TRANSFIL has 10 cycles)
   InfecMosq <- 0.37 # Vector competence, the proportion of mosquitoes which pick up the infection when biting an infective host (source: TRANSFIL)
-  epsilon <- 1/(14/3) # incubation rate of LF in mosquitoes (per-cycle)
-  InfHuman <- 0.01 # 0.01 is trial # Proportion of infected humans in the population with detectable microfilariae
+  epsilon <- user() # incubation rate of LF in mosquitoes (per-cycle)
+  InfHuman <- user()
   
   # 2. INITIAL VALUES ############################################################
   initial(E) <- 115
@@ -96,19 +96,79 @@ transition <- odin::odin({
   output(V_tot) <- V_tot
   
   output(prev) <- I_v_tot / V_tot
-  output(pos) <- (E_v_tot+I_v_tot) / V_tot
+  output(pos) <- (E_v_tot + I_v_tot) / V_tot
   
   config(base) <- "transition"
 })
 
 cycle_width_values <- seq(3, 30, by = 3)
+# InfHuman_values <- c(seq(0, 0.02, by = 0.001), seq(0.02, 1, by = 0.01))  # Separate InfHuman into 2 prevalence ranges; below WHO threshold and above
 Gompz_pars1 <- c(.356, .339) # 1 = An. gambiae, 2 = An. arabiensis
 Gompz_pars2 <- c(.097, .225) # 1 = An. gambiae, 2 = An. arabiensis
 
-pars <- list(cycle_width = cycle_width_values,
-             g1 = Gompz_pars1[1], # choose[1] for An. gambiae, [2] for An. arabiensis
-             g2 = Gompz_pars2[1]) # choose[1] for An. gambiae, [2] for An. arabiensis)
+# K_values <- seq(0, 268000, by = 100) # Assume V/H = 0.01 to 100,000 (given human pop H = 1,000 in TRANSFIL)
+lambda <- seq(0.01, 90, by = 0.1) # Assume biting rates can increase tenfolds outdoor
+epsilon <- seq(0.1875, 0.5, by = 0.01) # 1/(14/3) = 0.2142857; we wanna test 1/(7/3) to 1/(16/3)
+mu0 <- seq(0.025, 0.045, by = 0.001)
+sg <- seq(9.82, 18, by = 0.01)
+timesteps <- seq(0, 1000, by = 1)
 
-mod <- transition$new(user = pars) # changing the cycle by user loops instead of define the cycle_width one-by-one
-timesteps <- seq(0, 2000, by=1)   # time.
-y <- mod$run(timesteps)
+# MATRIX dimension storage (tried as hard as I can to avoid matrix but failed)
+E_mtx <- matrix(NA, nrow=length(timesteps), ncol=length(K_values))
+L_mtx <- matrix(NA, nrow=length(timesteps), ncol=length(K_values))
+N_mtx <- matrix(NA, nrow=length(timesteps), ncol=length(K_values))
+
+S_v_mtx <- matrix(NA, nrow=length(timesteps), ncol=length(K_values))
+E_v_mtx <- matrix(NA, nrow=length(timesteps), ncol=length(K_values))
+I_v_mtx <- matrix(NA, nrow=length(timesteps), ncol=length(K_values))
+
+V_mtx <- matrix(NA, nrow=length(timesteps), ncol=length(K_values))
+
+Prev_mtx <- matrix(NA, nrow=length(timesteps), ncol=length(K_values))
+Pos_mtx <- matrix(NA, nrow=length(timesteps), ncol=length(K_values))
+
+for (i in seq_along(sg)) {
+  sgg <- sg[i]
+  
+  pars <- list(cycle_width =cycle_width_values,
+               InfHuman =0.01, # Assume 1% human prevalence
+               K =267800,
+               lambda = 1,
+               epsilon = 1/(14/3),
+               mu0 = 0.034,
+               sg = sgg, # stored coz' I wanna print the progress
+               g1 =Gompz_pars1[1], # choose[1] for An. gambiae, [2] for An. arabiensis
+               g2 =Gompz_pars2[1]) # choose[1] for An. gambiae, [2] for An. arabiensis)
+  
+  mod <- transition$new(user = pars)
+  y <- mod$run(timesteps)
+  
+  # Store the results in the matrix
+  E_mtx[, i] <- y[, "E"]
+  L_mtx[, i] <- y[, "L"]
+  N_mtx[, i] <- y[, "N"]
+  
+  S_v_mtx[, i] <- y[, "S_v_tot"]
+  E_v_mtx[, i] <- y[, "E_v_tot"]
+  I_v_mtx[, i] <- y[, "I_v_tot"]
+  
+  V_mtx[, i] <- y[, "V_tot"]
+  
+  Prev_mtx[, i] <- y[,"prev"]
+  Pos_mtx[, i] <- y[,"pos"]
+  
+  # SHOW the progresss to avoid the computer's sleeping/logout -_-)
+  print(paste("Processing sg =", sgg))
+}
+
+# How to access the result?
+# How about save it to *csvs???
+write.csv(E_mtx, file="Output_E_mu0_Angambiae.csv", row.names =F)
+write.csv(L_mtx, file="Output_L_mu0_Angambiae.csv", row.names =F)
+write.csv(N_mtx, file="Output_N_mu0_Angambiae.csv", row.names =F)
+write.csv(S_v_mtx, file="Output_S_v_mu0_Angambiae.csv", row.names =F)
+write.csv(E_v_mtx, file="Output_E_v_mu0_Angambiae.csv", row.names =F)
+write.csv(I_v_mtx, file="Output_I_v_mu0_Angambiae.csv", row.names =F)
+write.csv(V_mtx, file="Output_V_mu0_Angambiae.csv", row.names =F)
+write.csv(Prev_mtx, file="Output_Prev_mu0_Angambiae.csv", row.names =F)
+write.csv(Pos_mtx, file="Output_Pos_mu0_Angambiae.csv", row.names =F)
