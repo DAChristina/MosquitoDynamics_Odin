@@ -1,8 +1,3 @@
-if (!require(odin, quietly=T)){
-  install.packages("odin")
-  library(odin)
-}
-
 transition <- odin::odin({
   N_cycle <- length(cycle_width)
   # Nulliparous means day 0, mosquitoes emerged from aquatic stages
@@ -107,7 +102,7 @@ Gompz_pars1 <- c(.356, .339) # 1 = An. gambiae, 2 = An. arabiensis
 Gompz_pars2 <- c(.097, .225) # 1 = An. gambiae, 2 = An. arabiensis
 
 # K_values <- seq(0, 268000, by = 100) # Assume V/H = 0.01 to 100,000 (given human pop H = 1,000 in TRANSFIL)
-lambda <- seq(0.01, 90, by = 0.1) # Assume biting rates can increase tenfolds outdoor
+# lambda <- seq(0.01, 90, by = 0.1) # Assume biting rates can increase tenfolds outdoor
 epsilon <- seq(0.1875, 0.5, by = 0.01) # 1/(14/3) = 0.2142857; we wanna test 1/(7/3) to 1/(16/3)
 timesteps <- seq(0, 1000, by = 1)
 
@@ -131,7 +126,7 @@ for (i in seq_along(epsilon)) {
   pars <- list(cycle_width =cycle_width_values,
                InfHuman =0.01, # Assume 1% human prevalence
                K =267800,
-               lambda = lamb,
+               lambda = 1,
                epsilon = eps, # epsilon stored in "eps" coz' I wanna print the progress
                g1 =Gompz_pars1[1], # choose[1] for An. gambiae, [2] for An. arabiensis
                g2 =Gompz_pars2[1]) # choose[1] for An. gambiae, [2] for An. arabiensis)
