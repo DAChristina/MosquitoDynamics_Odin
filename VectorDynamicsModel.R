@@ -108,18 +108,18 @@ mu0 <- seq(0.025, 0.045, by = 0.001)
 timesteps <- seq(0, 1000, by = 1)
 
 # MATRIX dimension storage (tried as hard as I can to avoid matrix but failed)
-E_mtx <- matrix(NA, nrow=length(timesteps), ncol=length(K_values))
-L_mtx <- matrix(NA, nrow=length(timesteps), ncol=length(K_values))
-N_mtx <- matrix(NA, nrow=length(timesteps), ncol=length(K_values))
+E_mtx <- matrix(NA, nrow=length(timesteps), ncol=length(mu0))
+L_mtx <- matrix(NA, nrow=length(timesteps), ncol=length(mu0))
+N_mtx <- matrix(NA, nrow=length(timesteps), ncol=length(mu0))
 
-S_v_mtx <- matrix(NA, nrow=length(timesteps), ncol=length(K_values))
-E_v_mtx <- matrix(NA, nrow=length(timesteps), ncol=length(K_values))
-I_v_mtx <- matrix(NA, nrow=length(timesteps), ncol=length(K_values))
+S_v_mtx <- matrix(NA, nrow=length(timesteps), ncol=length(mu0))
+E_v_mtx <- matrix(NA, nrow=length(timesteps), ncol=length(mu0))
+I_v_mtx <- matrix(NA, nrow=length(timesteps), ncol=length(mu0))
 
-V_mtx <- matrix(NA, nrow=length(timesteps), ncol=length(K_values))
+V_mtx <- matrix(NA, nrow=length(timesteps), ncol=length(mu0))
 
-Prev_mtx <- matrix(NA, nrow=length(timesteps), ncol=length(K_values))
-Pos_mtx <- matrix(NA, nrow=length(timesteps), ncol=length(K_values))
+Prev_mtx <- matrix(NA, nrow=length(timesteps), ncol=length(mu0))
+Pos_mtx <- matrix(NA, nrow=length(timesteps), ncol=length(mu0))
 
 for (i in seq_along(mu0)) {
   mu <- mu0[i]
