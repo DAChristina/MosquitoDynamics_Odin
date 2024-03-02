@@ -29,11 +29,25 @@ calcEpsilon <- function(day){
 calcEpsilon(7) # if day = 7, 1/(day/3) = 0.4285714, then epsilon[25]
 epsilon[25] # trial epsilon[25]
 
+calcEpsilon(12)
+epsilon[7]
+tail(dat_Prev[,7])
+tail(dat_Pos[,7])
+
+calcEpsilon(13)
+epsilon[5]
+tail(dat_Prev[,5])
+tail(dat_Pos[,5])
+
 calcEpsilon(14)
 epsilon[3]
+tail(dat_Prev[,3])
+tail(dat_Pos[,3])
 
 calcEpsilon(15)
 epsilon[2]
+tail(dat_Prev[,2])
+tail(dat_Pos[,2])
 
 calcEpsilon(16)
 epsilon[1]
