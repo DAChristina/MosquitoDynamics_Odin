@@ -107,22 +107,22 @@ Gompz_pars1 <- c(.356, .339) # 1 = An. gambiae, 2 = An. arabiensis
 Gompz_pars2 <- c(.097, .225) # 1 = An. gambiae, 2 = An. arabiensis
 
 # K_values <- seq(0, 268000, by = 100) # Assume V/H = 0.01 to 100,000 (given human pop H = 1,000 in TRANSFIL)
-lambda <- seq(0.01, 90, by = 0.1) # Assume biting rates can increase tenfolds outdoor
+lambda <- seq(0, 100, by = 0.1) # Assume biting rates can increase tenfolds outdoor
 timesteps <- seq(0, 1000, by = 1)
 
 # MATRIX dimension storage (tried as hard as I can to avoid matrix but failed)
-E_mtx <- matrix(NA, nrow=length(timesteps), ncol=length(K_values))
-L_mtx <- matrix(NA, nrow=length(timesteps), ncol=length(K_values))
-N_mtx <- matrix(NA, nrow=length(timesteps), ncol=length(K_values))
+E_mtx <- matrix(NA, nrow=length(timesteps), ncol=length(lambda))
+L_mtx <- matrix(NA, nrow=length(timesteps), ncol=length(lambda))
+N_mtx <- matrix(NA, nrow=length(timesteps), ncol=length(lambda))
 
-S_v_mtx <- matrix(NA, nrow=length(timesteps), ncol=length(K_values))
-E_v_mtx <- matrix(NA, nrow=length(timesteps), ncol=length(K_values))
-I_v_mtx <- matrix(NA, nrow=length(timesteps), ncol=length(K_values))
+S_v_mtx <- matrix(NA, nrow=length(timesteps), ncol=length(lambda))
+E_v_mtx <- matrix(NA, nrow=length(timesteps), ncol=length(lambda))
+I_v_mtx <- matrix(NA, nrow=length(timesteps), ncol=length(lambda))
 
-V_mtx <- matrix(NA, nrow=length(timesteps), ncol=length(K_values))
+V_mtx <- matrix(NA, nrow=length(timesteps), ncol=length(lambda))
 
-Prev_mtx <- matrix(NA, nrow=length(timesteps), ncol=length(K_values))
-Pos_mtx <- matrix(NA, nrow=length(timesteps), ncol=length(K_values))
+Prev_mtx <- matrix(NA, nrow=length(timesteps), ncol=length(lambda))
+Pos_mtx <- matrix(NA, nrow=length(timesteps), ncol=length(lambda))
 
 for (i in seq_along(lambda)) {
   lamb <- lambda[i]
